@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'hubspot-api-client'
 
 class Api::V1::HubspotReferencesController < ApplicationController
