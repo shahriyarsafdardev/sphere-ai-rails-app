@@ -1,6 +1,4 @@
 class Api::V1::PostgresReferencesController < ApplicationController
-  include PostgresHelper
-
   before_action :set_user, only: %i[my_references create]
   before_action :set_postgres_reference, only: %i[query show update]
 
@@ -30,19 +28,21 @@ class Api::V1::PostgresReferencesController < ApplicationController
   end
 
   def query
-    result = execute_query(@postgres_reference, params[:query])
-    render json: { result: result }, status: :ok
+    result = GptService.query_with_postgres_reference(@postgres_reference, params[:query])
+    parsed_query = result.split('::')&.second&.split('::')&.first
+    query_response = PostgresService.execute_query(@postgres_reference, parsed_query)
+    render json: { message: result, query: parsed_query, result: query_response }, status: :ok
   end
 
   private
 
   def postgres_reference_params
-    params.require(:postgres_reference).permit(:db_name, :user_name, :password, :host, :port)
+    params.require(:postgres_reference).permit(:title, :db_name, :db_user_name, :password, :host, :port)
   end
 
   def set_user
     @user = User.find_by(email: params[:email])
-    render json: { message: 'User not found!' }, status: unprocessable_entity if @user.blank?
+    render json: { message: 'User not found!' }, status: :unprocessable_entity if @user.blank?
   end
 
   def set_postgres_reference
@@ -50,6 +50,6 @@ class Api::V1::PostgresReferencesController < ApplicationController
     return unless @postgres_reference.blank?
 
     render json: { message: 'Postgres reference not found!' },
-           status: unprocessable_entity
+           status: :unprocessable_entity
   end
 end
