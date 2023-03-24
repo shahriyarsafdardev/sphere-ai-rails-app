@@ -8,6 +8,14 @@ Rails.application.routes.draw do
           post :login
         end
       end
+      resources :postgres_references do
+        member do
+          get :query
+        end
+        collection do
+          get :my_references
+        end
+      end
     end
   end
 end

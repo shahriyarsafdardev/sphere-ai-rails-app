@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  has_many :postgres_references, dependent: :destroy
+
   extend FriendlyId
   friendly_id :slugged_candidates, use: :slugged
 
