@@ -28,7 +28,8 @@ class GptService
       response.dig('choices', 0, 'message', 'content').to_s.strip
     end
 
-    def query_with_hubspot_reference(raw_query, access_token = 'YOUR_HUBSPOT_ACCESS_TOKEN')
+    def query_with_hubspot_reference(raw_query, id)
+      access_token = HubspotReference.find_by_id(id)&.hubspot_access_token
       properties = HubspotService.get_schema('Contact', access_token)
       operators = %w[EQ NEQ LT LTE GT GTE BETWEEN IN NOT_IN HAS_PROPERTY NOT_HAS_PROPERTY CONTAINS_TOKEN NOT_CONTAINS_TOKEN]
       prompt = "Please extract the filters from the user input: \"#{raw_query}\" and create a HubSpot API request body with only the filterGroups and filters based on the following available properties: #{properties} and following available operators: #{operators}. Don't include the property names in body"
