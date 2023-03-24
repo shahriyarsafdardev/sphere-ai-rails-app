@@ -27,28 +27,15 @@ class GptService
     end
 
     def query_with_hubspot_reference(raw_query, access_token)
-      api_client = HubspotService.connect_client(access_token)
-      api_response = api_client.crm.properties.core_api.get_all(object_type: 'Contact', archived: false)
-      properties = api_response.results.map { |r| r.name }
+      properties = HubspotService.get_schema('Contact', access_token)
       operators = ["EQ", "NEQ", "LT", "LTE", "GT", "GTE", "BETWEEN", "IN", "NOT_IN", "HAS_PROPERTY", "NOT_HAS_PROPERTY", "CONTAINS_TOKEN", "NOT_CONTAINS_TOKEN"]
-      prompt = "Please extract the filters from the user input: \"#{raw_query}\" and create a HubSpot API request body with only the filterGroups and filters based on the  following available properties: #{properties} and following availsble operators: #{operators}. Don't include the property names in body"
-      body_json = get_gpt_response(prompt, access_token)
+      prompt = "Please extract the filters from the user input: \"#{raw_query}\" and create a HubSpot API request body with only the filterGroups and filters based on the following available properties: #{properties} and following available operators: #{operators}. Don't include the property names in body"
+      body_json = get_gpt_response(prompt)
       body_json["properties"] = properties
       HubspotService.get_filtered_results_from_hubspot(body_json, access_token)
     end
 
-    def generate_query(prompt)
-      response = ClientOpenAI.chat(
-        parameters: {
-          model: 'gpt-4',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.5,
-        }
-      )
-      response.dig('choices', 0, 'message', 'content').to_s.strip
-    end
-
-    def get_gpt_response(prompt, access_token)
+    def get_gpt_response(prompt)
       openai_api_key = ENV['OPENAI_ACCESS_TOKEN']
       headers = {
         'Content-Type' => 'application/json',
@@ -61,7 +48,7 @@ class GptService
         temperature: 0.5,
       }
       response_json = parse_response(request_body, headers)
-      body = response_json["choices"][0]["message"]["content"].match(/```(.|\n)*```/).to_s.gsub(/```|\n/, '')
+      body = response_json.dig('choices', 0, 'message', 'content')&.match(/```(.|\n)*```/).to_s.gsub(/```|\n/, '')
       body_json = JSON.parse(body)
     end
 
