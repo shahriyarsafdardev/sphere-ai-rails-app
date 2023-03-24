@@ -101,6 +101,7 @@ GEM
     marcel (1.0.2)
     method_source (1.0.0)
     mini_mime (1.1.2)
+    mini_portile2 (2.8.1)
     minitest (5.18.0)
     msgpack (1.6.1)
     multi_xml (0.6.0)
@@ -114,7 +115,8 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.8)
-    nokogiri (1.14.2-x86_64-darwin)
+    nokogiri (1.14.2)
+      mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     orm_adapter (0.5.0)
     parallel (1.22.1)
@@ -175,8 +177,6 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.27.0)
       parser (>= 3.2.1.0)
-    rubocop-capybara (2.17.1)
-      rubocop (~> 1.41)
     rubocop-performance (1.16.0)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
@@ -184,12 +184,9 @@ GEM
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.33.0, < 2.0)
-    rubocop-rspec (2.19.0)
-      rubocop (~> 1.33)
-      rubocop-capybara (~> 2.17)
-    ruby-progressbar (1.13.0)
-    ruby-openai (3.5.0)
+    ruby-openai (3.6.0)
       httparty (>= 0.18.1)
+    ruby-progressbar (1.13.0)
     spring (2.1.1)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -214,7 +211,7 @@ GEM
     zeitwerk (2.6.7)
 
 PLATFORMS
-  x86_64-darwin-21
+  ruby
 
 DEPENDENCIES
   bootsnap (>= 1.4.2)
@@ -228,14 +225,13 @@ DEPENDENCIES
   rubocop
   rubocop-performance
   rubocop-rails
-  rubocop-rspec
   ruby-openai
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data
 
 RUBY VERSION
-   ruby 3.0.5p211
+   ruby 3.1.3p185
 
 BUNDLED WITH
    2.2.33

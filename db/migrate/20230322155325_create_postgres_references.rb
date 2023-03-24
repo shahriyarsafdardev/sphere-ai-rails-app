@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreatePostgresReferences < ActiveRecord::Migration[6.0]
   def change
     create_table :postgres_references, id: :uuid do |t|
