@@ -50,3 +50,7 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # Ruby OpenAI for GPT4
 gem 'ruby-openai'
 gem 'hubspot-api-client'
+
+gem 'hubspot-ruby'
+
+gem 'faraday', '~> 2.7', '>= 2.7.4'

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'hubspot-api-client'
-
 class Api::V1::HubspotReferencesController < ApplicationController
   before_action :set_hubspot_reference, only: %i[show update destroy]
 
@@ -31,11 +30,6 @@ class Api::V1::HubspotReferencesController < ApplicationController
 
   def destroy
     @hubspot_reference.destroy
-  end
-
-  def all_hubspot_contacts
-    # client = Hubspot::Client.new(access_token: '')
-    # client.crm.contacts.basic_api.get_all
   end
 
   private
