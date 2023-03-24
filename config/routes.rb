@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   devise_for :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
@@ -6,6 +8,11 @@ Rails.application.routes.draw do
       resources :users, only: %i[create update] do
         collection do
           post :login
+          patch :update_password
+        end
+        member do
+          patch :change_password
+          post :reset_password
         end
       end
       resources :postgres_references do
