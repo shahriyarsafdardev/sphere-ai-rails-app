@@ -25,7 +25,7 @@ class HubspotService
       api_response.results.map(&:name)
     end
 
-    def get_filtered_results_from_hubspot(body, properties, access_token)
+    def get_filtered_results_from_hubspot(body, access_token)
       api_client = connect_client(access_token)
       
       api_client.crm.contacts.search_api.do_search(

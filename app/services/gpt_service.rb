@@ -33,7 +33,8 @@ class GptService
       operators = ["EQ", "NEQ", "LT", "LTE", "GT", "GTE", "BETWEEN", "IN", "NOT_IN", "HAS_PROPERTY", "NOT_HAS_PROPERTY", "CONTAINS_TOKEN", "NOT_CONTAINS_TOKEN"]
       prompt = "Please extract the filters from the user input: \"#{raw_query}\" and create a HubSpot API request body with only the filterGroups and filters based on the  following available properties: #{properties} and following availsble operators: #{operators}. Don't include the property names in body"
       body_json = get_gpt_response(prompt, access_token)
-      HubspotService.get_filtered_results_from_hubspot(body_json, properties, access_token)
+      body_json["properties"] = properties
+      HubspotService.get_filtered_results_from_hubspot(body_json, access_token)
     end
 
     def generate_query(prompt)
