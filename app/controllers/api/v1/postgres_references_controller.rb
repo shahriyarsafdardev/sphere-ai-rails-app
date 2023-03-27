@@ -17,24 +17,24 @@ class Api::V1::PostgresReferencesController < ApplicationController
 
   def create
     @postgres_reference = @user.postgres_references.new(postgres_reference_params)
-    render json: { reference: @postgres_reference }, status: :ok if @postgres_reference.save!
+    render json: { postgres_reference: @postgres_reference }, status: :ok if @postgres_reference.save!
   end
 
   def update
     @postgres_reference.update!(postgres_reference_params)
 
-    render json: { reference: @postgres_reference }, status: :ok
+    render json: { postgres_reference: @postgres_reference }, status: :ok
   end
 
   def show
-    render json: { reference: @postgres_reference }, status: :ok
+    render json: { postgres_reference: @postgres_reference }, status: :ok
   end
 
   def query
     result = GptService.query_with_postgres_reference(@postgres_reference, params[:query])
     parsed_query = result.split('::')&.second&.split('::')&.first
     query_response = PostgresService.execute_query(@postgres_reference, parsed_query)
-    render json: { message: result, query: parsed_query, result: query_response }, status: :ok
+    render json: { message: result, result: query_response }, status: :ok
   end
 
   private

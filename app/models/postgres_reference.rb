@@ -7,6 +7,6 @@ class PostgresReference < ApplicationRecord
     result = GptService.query_with_postgres_reference(self, query)
     parsed_query = result.split('::')&.second&.split('::')&.first
     query_response = PostgresService.execute_query(self, parsed_query)
-    { query: parsed_query, result: query_response }
+    { message: result, result: query_response }
   end
 end
