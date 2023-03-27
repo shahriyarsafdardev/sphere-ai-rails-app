@@ -7,11 +7,11 @@ class Api::V1::HubspotReferencesController < ApplicationController
   def index
     @hubspot_references = HubspotReference.all
 
-    render json: @hubspot_references
+    render json: @hubspot_references, each_serializer: HubspotReferenceSerializer, status: :ok
   end
 
   def show
-    render json: @hubspot_reference
+    render json: @hubspot_reference, serializer: HubspotReferenceSerializer, status: :ok
   end
 
   def create

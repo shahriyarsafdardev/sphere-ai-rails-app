@@ -23,7 +23,7 @@ Rails.application.routes.draw do
           get :my_references
         end
       end
-      resources :hubspot_references, only: %i[create update destroy]
+      resources :hubspot_references, only: %i[create update destroy show index]
     end
   end
 end

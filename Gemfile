@@ -47,10 +47,10 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
+gem 'faraday', '~> 2.7', '>= 2.7.4'
+gem 'hubspot-api-client'
+gem 'hubspot-ruby'
 # Ruby OpenAI for GPT4
 gem 'ruby-openai'
-gem 'hubspot-api-client'
-
-gem 'hubspot-ruby'
-
-gem 'faraday', '~> 2.7', '>= 2.7.4'
+# Active model serialization
+gem 'active_model_serializers'
