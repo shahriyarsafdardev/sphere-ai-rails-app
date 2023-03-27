@@ -54,3 +54,5 @@ gem 'hubspot-ruby'
 gem 'ruby-openai'
 # Active model serialization
 gem 'active_model_serializers'
+gem 'devise-jwt'
+gem 'rack-cors'
