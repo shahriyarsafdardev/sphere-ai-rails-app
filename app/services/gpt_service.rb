@@ -32,10 +32,10 @@ class GptService
       access_token = HubspotReference.find_by_id(id)&.hubspot_access_token
       properties = HubspotService.get_schema('Contact', access_token)
       operators = %w[EQ NEQ LT LTE GT GTE BETWEEN IN NOT_IN HAS_PROPERTY NOT_HAS_PROPERTY CONTAINS_TOKEN NOT_CONTAINS_TOKEN]
-      prompt = "Please extract the filters from the user input: \"#{raw_query}\" and create a HubSpot API request body with only the filterGroups and filters based on the following available properties: #{properties} and following available operators: #{operators}. Don't include the property names in body"
+      prompt = "Please extract the filters from the user input: #{raw_query} and create a HubSpot API request body with filterGroups and filters based on the following available propertyNames: #{properties} and the following available operators: #{operators}. If the user input contains multiple filters with the AND operator, place all the filters within a single filterGroup. If the user input contains multiple filters with the OR operator, place each filter within its own filterGroup. Do not include the property names in the body."
       body_json = get_gpt_response(prompt)
       # body_json['properties'] = properties
-      HubspotService.get_filtered_results_from_hubspot(body_json, access_token)
+      data = HubspotService.get_filtered_results_from_hubspot(body_json, access_token)
     end
 
     def get_gpt_response(prompt)
@@ -51,6 +51,7 @@ class GptService
       }
       response_json = parse_response(request_body, headers)
       body = response_json.dig('choices', 0, 'message', 'content')&.match(/```(.|\n)*```/).to_s.gsub(/```|\n/, '')
+      body = body.gsub('json', '')
       JSON.parse(body)
     end
 
