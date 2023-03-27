@@ -7,27 +7,27 @@ class Api::V1::PostgresReferencesController < ApplicationController
 
   def index
     @postgres_references = PostgresReference.all
-    render json: { references: @postgres_references }, status: :ok
+    render json: @postgres_references, each_serializer: PostgresReferenceSerializer, status: :ok
   end
 
   def my_references
     @postgres_references = @user.postgres_references
-    render json: { references: @postgres_references }, status: :ok
+    render json: @postgres_references, each_serializer: PostgresReferenceSerializer, status: :ok
   end
 
   def create
     @postgres_reference = @user.postgres_references.new(postgres_reference_params)
-    render json: { postgres_reference: @postgres_reference }, status: :ok if @postgres_reference.save!
+    render json: @postgres_reference, message: 'Postgres reference created successfully!', status: :ok if @postgres_reference.save!
   end
 
   def update
     @postgres_reference.update!(postgres_reference_params)
 
-    render json: { postgres_reference: @postgres_reference }, status: :ok
+    render json: @postgres_reference, message: 'Postgres reference updated successfully!', status: :ok
   end
 
   def show
-    render json: { postgres_reference: @postgres_reference }, status: :ok
+    render json: @postgres_reference, status: :ok
   end
 
   def query
