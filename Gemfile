@@ -54,3 +54,7 @@ gem 'hubspot-api-client'
 gem 'hubspot-ruby'
 
 gem 'faraday', '~> 2.7', '>= 2.7.4'
+
+gem 'devise-jwt'
+
+gem 'rack-cors'
