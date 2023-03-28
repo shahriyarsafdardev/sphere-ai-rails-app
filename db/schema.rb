@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_21_205502) do
+ActiveRecord::Schema.define(version: 2023_03_27_201017) do
 
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "hubspot_references", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -23,6 +24,25 @@ ActiveRecord::Schema.define(version: 2023_03_21_205502) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_hubspot_references_on_user_id"
+  end
+
+  create_table "jwt_denylist", force: :cascade do |t|
+    t.string "jti", null: false
+    t.datetime "exp", null: false
+    t.index ["jti"], name: "index_jwt_denylist_on_jti"
+  end
+
+  create_table "postgres_references", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "title", null: false
+    t.string "db_name", null: false
+    t.string "db_user_name", null: false
+    t.string "password", null: false
+    t.string "host", null: false
+    t.integer "port", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_postgres_references_on_user_id"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -44,4 +64,5 @@ ActiveRecord::Schema.define(version: 2023_03_21_205502) do
   end
 
   add_foreign_key "hubspot_references", "users"
+  add_foreign_key "postgres_references", "users"
 end
