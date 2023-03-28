@@ -31,6 +31,9 @@ Rails.application.routes.draw do
         member do
           get :query
         end
+        collection do
+          get :my_references
+        end
       end
     end
   end

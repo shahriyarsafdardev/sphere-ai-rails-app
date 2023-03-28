@@ -2,7 +2,9 @@
 
 require 'hubspot-api-client'
 class Api::V1::HubspotReferencesController < ApplicationController
+  include UserHelper
   before_action :set_hubspot_reference, only: %i[show update destroy query]
+  before_action :find_user_through_email, only: %i[my_references]
 
   def index
     @hubspot_references = HubspotReference.all
@@ -35,6 +37,11 @@ class Api::V1::HubspotReferencesController < ApplicationController
   def query
     response = @hubspot_reference.run_query(params[:query])
     render json: response, status: :ok
+  end
+
+  def my_references
+    @hubspot_references = @user.hubspot_references
+    render json: @hubspot_references, each_serializer: HubspotReferenceSerializer, status: :ok
   end
 
   private
