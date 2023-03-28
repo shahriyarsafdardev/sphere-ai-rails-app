@@ -52,7 +52,11 @@ class Api::V1::UsersController < ApplicationController
 
   private
 
-  def devis
+  def user_create_params
+    params.require(:user).permit(:first_name, :last_name, :email, :password)
+  end
+
+  def user_update_params
     params.require(:user).permit(:first_name, :last_name)
   end
 end
