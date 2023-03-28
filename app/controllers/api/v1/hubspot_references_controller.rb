@@ -2,7 +2,7 @@
 
 require 'hubspot-api-client'
 class Api::V1::HubspotReferencesController < ApplicationController
-  before_action :set_hubspot_reference, only: %i[show update destroy]
+  before_action :set_hubspot_reference, only: %i[show update destroy query]
 
   def index
     @hubspot_references = HubspotReference.all
@@ -30,6 +30,11 @@ class Api::V1::HubspotReferencesController < ApplicationController
 
   def destroy
     @hubspot_reference.destroy
+  end
+
+  def query
+    response = @hubspot_reference.run_query(params[:query])
+    render json: response, status: :ok
   end
 
   private
