@@ -3,14 +3,7 @@
 class Api::V1::UsersController < ApplicationController
   include UserHelper
 
-  before_action :find_user_through_email, only: %i[login]
   before_action :find_user_through_slug, only: %i[update change_password reset_password]
-
-  def login
-    return render json: { message: 'Incorrect email or password' }, status: :unprocessable_entity if @user.nil? || !@user.valid_password?(params[:password])
-
-    render json: { message: 'Login successful' }, status: :ok
-  end
 
   def create
     @user = User.new(user_create_params)
@@ -59,11 +52,7 @@ class Api::V1::UsersController < ApplicationController
 
   private
 
-  def user_create_params
-    params.require(:user).permit(:first_name, :last_name, :email, :password)
-  end
-
-  def user_update_params
+  def devis
     params.require(:user).permit(:first_name, :last_name)
   end
 end

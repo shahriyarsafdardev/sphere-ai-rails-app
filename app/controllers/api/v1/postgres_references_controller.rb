@@ -31,10 +31,8 @@ class Api::V1::PostgresReferencesController < ApplicationController
   end
 
   def query
-    result = GptService.query_with_postgres_reference(@postgres_reference, params[:query])
-    parsed_query = result.split('::')&.second&.split('::')&.first
-    query_response = PostgresService.execute_query(@postgres_reference, parsed_query)
-    render json: { message: result, result: query_response }, status: :ok
+    result = @postgres_reference.run_query(params[:query])
+    render json: result, status: :ok
   end
 
   private
