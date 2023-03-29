@@ -8,7 +8,7 @@ class GptService
   class << self
     def query_with_postgres_reference(reference, raw_query)
       table_names = PostgresService.fetch_table_names(reference)
-      tables_prompt = "Your goal is to take this text: \"#{raw_query}\" process a query and return the table names most likely used in the query. These are the table names in the database #{table_names}. Add :: before the table name and don't add any additional information"
+      tables_prompt = "Process the documentation from ‘#{reference&.documentation}’ and table names from ‘#{table_names}’ to return the appropriate table names needed to process the query ‘#{raw_query}‘. Add :: before the table name and don’t add any additional information and tables"
       parsed_table_names = ask_gpt(tables_prompt)&.scan(/::\w+/)&.map do |t|
                              t[2...t.length]
                            end&.map { |table| "'#{table}'" }&.join(', ')

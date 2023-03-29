@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class Api::V1::PostgresReferencesController < ApplicationController
-  include UserHelper
-  before_action :find_user_through_email, only: %i[my_references create]
   before_action :set_postgres_reference, only: %i[query show update]
+  before_action :authenticate_user!
 
   def index
     @postgres_references = PostgresReference.all
@@ -11,12 +10,12 @@ class Api::V1::PostgresReferencesController < ApplicationController
   end
 
   def my_references
-    @postgres_references = @user.postgres_references
+    @postgres_references = current_user.postgres_references
     render json: @postgres_references, each_serializer: PostgresReferenceSerializer, status: :ok
   end
 
   def create
-    @postgres_reference = @user.postgres_references.new(postgres_reference_params)
+    @postgres_reference = current_user.postgres_references.new(postgres_reference_params)
     render json: @postgres_reference, message: 'Postgres reference created successfully!', status: :ok if @postgres_reference.save!
   end
 
@@ -31,10 +30,10 @@ class Api::V1::PostgresReferencesController < ApplicationController
   end
 
   def query
-    result = GptService.query_with_postgres_reference(@postgres_reference, params[:query])
-    parsed_query = result.split('::')&.second&.split('::')&.first
-    query_response = PostgresService.execute_query(@postgres_reference, parsed_query)
-    render json: { message: result, result: query_response }, status: :ok
+    result = @postgres_reference.run_query(params[:query])
+    render json: result, status: :ok
+  rescue StandardError => e
+    render json: { message: e.message }, status: :unprocessable_entity
   end
 
   private

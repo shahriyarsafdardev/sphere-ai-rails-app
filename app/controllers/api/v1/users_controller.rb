@@ -1,15 +1,10 @@
 # frozen_string_literal: true
 
 class Api::V1::UsersController < ApplicationController
-  include UserHelper
+  before_action :authenticate_user!, except: %i[reset_password update_password]
 
-  before_action :find_user_through_email, only: %i[login]
-  before_action :find_user_through_slug, only: %i[update change_password reset_password]
-
-  def login
-    return render json: { message: 'Incorrect email or password' }, status: :unprocessable_entity if @user.nil? || !@user.valid_password?(params[:password])
-
-    render json: { message: 'Login successful' }, status: :ok
+  def my_account
+    render json: { user: current_user }, status: :ok
   end
 
   def create
@@ -23,7 +18,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def update
-    if @user.update(user_update_params)
+    if current_user.update(user_update_params)
       render json: { message: 'User updated successfully' }, status: :ok
     else
       render json: { message: 'Unable to update user' }, status: :unprocessable_entity
@@ -31,9 +26,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def change_password
-    if !@user.valid_password?(params[:old_password])
+    if !current_user.valid_password?(params[:old_password])
       render json: { message: 'Incorrect current password provided' }, status: :unprocessable_entity
-    elsif params[:new_password].present? && @user.update(password: params[:new_password])
+    elsif params[:new_password].present? && current_user.update(password: params[:new_password])
       render json: { message: 'Password saved' }, status: :ok
     else
       render json: { message: 'Failed to update password' }, status: :unprocessable_entity
@@ -41,8 +36,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def reset_password
-    token = @user.create_password_token
-    # UserMailer.reset_password(@user, "#{ENV['REACT_APP_URL']}/auth/update-password?reset_password_token=#{token}").deliver_later
+    token = current_user.create_password_token
+    # UserMailer.reset_password(current_user, "#{ENV['REACT_APP_URL']}/auth/update-password?reset_password_token=#{token}").deliver_later
     render json: {}, status: :ok
   end
 

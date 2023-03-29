@@ -10,7 +10,7 @@ class PostgresService
       )
       result = connection.exec(query)
       connection.close
-      result
+      result&.map { |row| row }
     end
 
     def fetch_tables_schema(postgres_reference, table_names)
@@ -19,13 +19,13 @@ class PostgresService
       # tables and associations
       # sql = "SELECT conrelid::regclass AS table_name, conname, pg_get_constraintdef(c.oid) AS constraint_def FROM pg_constraint c WHERE contype = 'f' ORDER BY conrelid::regclass::text, conname;"
       # schema of some specific tables
-      sql = "SELECT tc.table_name, tc.column_name, tc.data_type, tc.is_nullable, ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name FROM information_schema.columns AS tc LEFT JOIN information_schema.key_column_usage AS kcu ON tc.table_name = kcu.table_name AND tc.column_name = kcu.column_name LEFT JOIN information_schema.constraint_column_usage AS ccu ON kcu.constraint_name = ccu.constraint_name WHERE tc.table_name IN (#{table_names}) ORDER BY tc.table_name, tc.ordinal_position;"
-      execute_query(postgres_reference, sql).map { |row| row }
+      sql = "SELECT tc.table_name AS table, tc.column_name AS column, ccu.table_name AS foreign_table FROM information_schema.columns AS tc LEFT JOIN information_schema.key_column_usage AS kcu ON tc.table_name = kcu.table_name AND tc.column_name = kcu.column_name LEFT JOIN information_schema.constraint_column_usage AS ccu ON kcu.constraint_name = ccu.constraint_name WHERE tc.table_name IN (#{table_names}) ORDER BY tc.table_name, tc.ordinal_position;"
+      execute_query(postgres_reference, sql)&.map { |row| row }
     end
 
     def fetch_table_names(postgres_reference)
       sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"
-      execute_query(postgres_reference, sql).map { |row| row['table_name'] }
+      execute_query(postgres_reference, sql)&.map { |row| row['table_name'] }
     end
   end
 end

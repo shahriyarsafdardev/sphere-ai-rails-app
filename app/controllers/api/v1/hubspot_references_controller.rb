@@ -2,9 +2,8 @@
 
 require 'hubspot-api-client'
 class Api::V1::HubspotReferencesController < ApplicationController
-  include UserHelper
   before_action :set_hubspot_reference, only: %i[show update destroy query]
-  before_action :find_user_through_email, only: %i[my_references]
+  before_action :authenticate_user!
 
   def index
     @hubspot_references = HubspotReference.all
@@ -35,12 +34,16 @@ class Api::V1::HubspotReferencesController < ApplicationController
   end
 
   def query
-    response = @hubspot_reference.run_query(params[:query])
-    render json: response, status: :ok
+    begin 
+      response = @hubspot_reference.run_query(params[:query])
+      render json: { result: response[:result].results.map{ |res| res.properties } }, status: :ok
+    rescue StandardError => e
+      render json: { message: e.message }, status: :unprocessable_entity
+    end
   end
 
   def my_references
-    @hubspot_references = @user.hubspot_references
+    @hubspot_references = current_user.hubspot_references
     render json: @hubspot_references, each_serializer: HubspotReferenceSerializer, status: :ok
   end
 
