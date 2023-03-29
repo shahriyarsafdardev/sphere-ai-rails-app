@@ -4,17 +4,20 @@ require 'faraday'
 
 desc 'Fetch companies html pages data after bing search'
 task fetch_companies_data: [:environment] do |_t, _args|
-  companies = %w[Apple Google Rakuten Nvidia Twilio]
+  companies = %w[Apple Meta Google Rakuten Nvidia Twilio]
+  companies_data_file = 'companies_data.csv'
 
-  CSV.open('companies_data.csv', 'w') do |csv|
+  CSV.open(companies_data_file, 'w') do |csv|
     csv << %w[Name URL HTML Type]
     companies.each do |company|
       search_sentence = "#{company} investor relations"
       puts "Query: #{search_sentence}"
       puts 'URLs from bing search'
       results = bing_search(search_sentence)
-      page_doc, url = extract_page_data(results)
-      csv << [company, url, page_doc, '']
+      page_html, url = extract_page_data(results)
+      page_html.scan(%r{<a.*?</a>})&.each do |anchor|
+        csv << [company, url, anchor, '']
+      end
     end
   end
 end
@@ -51,7 +54,7 @@ def extract_page_data(results)
   driver = Selenium::WebDriver.for(:chrome, options: options)
   driver.get(url)
   driver.execute_script('return document.readyState')
-  html = driver.page_source
+  html = driver.find_element(:tag_name => "body").attribute('innerHTML')
   driver.quit
   [html, url]
 end
