@@ -31,8 +31,12 @@ class Api::V1::PostgresReferencesController < ApplicationController
   end
 
   def query
-    result = @postgres_reference.run_query(params[:query])
-    render json: result, status: :ok
+    begin
+      result = @postgres_reference.run_query(params[:query])
+      render json: result, status: :ok
+    rescue StandardError => e
+      render json: { message: e.message }, status: :unprocessable_entity
+    end
   end
 
   private

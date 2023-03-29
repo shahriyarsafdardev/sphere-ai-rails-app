@@ -35,8 +35,12 @@ class Api::V1::HubspotReferencesController < ApplicationController
   end
 
   def query
-    response = @hubspot_reference.run_query(params[:query])
-    render json: response, status: :ok
+    begin 
+      response = @hubspot_reference.run_query(params[:query])
+      render json: { result: response[:result].results.map{ |res| res.properties } }, status: :ok
+    rescue StandardError => e
+      render json: { message: e.message }, status: :unprocessable_entity
+    end
   end
 
   def my_references
