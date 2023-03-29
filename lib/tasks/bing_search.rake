@@ -38,7 +38,7 @@ def bing_search(search_sentence)
 end
 
 def extract_pdf_links(results)
-  pdf_links = []
+  all_pdf_links = []
 
   puts 'URLs from bing search'
   results['webPages']['value'].each do |result|
@@ -47,16 +47,26 @@ def extract_pdf_links(results)
     next if res.status != 200
 
     puts "URL: #{url}"
-    html = URI.open(url).read
-    doc = Nokogiri::HTML(html)
 
+    options = Selenium::WebDriver::Chrome::Options.new
+    options.add_argument('--headless')
+    driver = Selenium::WebDriver.for(:chrome, options: options)
+
+    driver.get(url)
+
+    # wait = Selenium::WebDriver::Wait.new(timeout: 10)
+    # wait.until { driver.execute_script('return document.readyState') == 'complete' }
+    driver.execute_script('return document.readyState')
+
+    html = driver.page_source
+    doc = Nokogiri::HTML(html)
     sitemap_url = extract_sitemap_url(doc)
     puts "Sitemap URL: #{sitemap_url}" if sitemap_url
-
-    pdf_links += extract_pdf_links_from_doc(doc, url)
+    pdf_links = doc.css('a[href$=".pdf"]').map { |link| link['href'] } || []
+    driver.quit
+    all_pdf_links += extract_pdf_links_from_doc(pdf_links, url)
   end
-
-  pdf_links
+  all_pdf_links
 end
 
 def extract_sitemap_url(doc)
@@ -64,14 +74,14 @@ def extract_sitemap_url(doc)
   sitemap_link['href'] if sitemap_link
 end
 
-def extract_pdf_links_from_doc(doc, url)
+def extract_pdf_links_from_doc(pdf_links, url)
   updated_pdf_links = []
-  pdf_links = doc.xpath('//@href').select { |link| link.to_s.end_with?('.pdf') }.map(&:to_s)
-  domain = URI.parse(url).host
+  domain = URI(url).host
   pdf_links.each do |pdf_link|
     if pdf_link.exclude?('https') && pdf_link.exclude?('http')
+      pdf_domain = URI(pdf_link).host
       pdf_link = pdf_link.gsub(%r{\A[/.]+}, '')
-      pdf_link = if pdf_link.exclude?(domain)
+      pdf_link = if !pdf_domain
                    "https://#{domain}/#{pdf_link}"
                  else
                    "https://#{pdf_link}"
@@ -91,8 +101,8 @@ def extract_target_paragraphs(pdf_links)
       pdf = URI.open(url)
       reader = PDF::Reader.new(pdf)
       text = reader.pages.map(&:text).join(' ')
-      paragraphs = text.split(/\n\n+/)
-      target_paragraphs = paragraphs.select { |p| p.match(/\b(goal|objective)\b/i) }
+      paragraphs = text.split(/\.\n\n+/)
+      target_paragraphs = paragraphs.select { |p| p.match(/\b(goal|objective|segment)\b/i) }
       all_paragraphs += target_paragraphs.map(&:squeeze) if target_paragraphs.present?
     rescue StandardError => e
       puts e

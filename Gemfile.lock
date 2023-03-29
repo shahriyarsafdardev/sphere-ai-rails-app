@@ -237,6 +237,11 @@ GEM
     ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
     ruby2_keywords (0.0.5)
+    rubyzip (2.3.2)
+    selenium-webdriver (4.8.6)
+      rexml (~> 3.2, >= 3.2.5)
+      rubyzip (>= 1.2.2, < 3.0)
+      websocket (~> 1.0)
     spring (2.1.1)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -267,6 +272,7 @@ GEM
       dry-configurable (>= 0.13, < 2)
       jwt (~> 2.1)
       warden (~> 1.2)
+    websocket (1.2.9)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -297,6 +303,7 @@ DEPENDENCIES
   rubocop-performance
   rubocop-rails
   ruby-openai
+  selenium-webdriver
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data
