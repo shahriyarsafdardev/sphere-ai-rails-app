@@ -55,4 +55,7 @@ gem 'ruby-openai'
 # Active model serialization
 gem 'active_model_serializers'
 gem 'devise-jwt'
+gem 'nokogiri'
+gem 'open-uri'
+gem 'pdf-reader'
 gem 'rack-cors'
