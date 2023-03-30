@@ -5,6 +5,7 @@ require 'faraday'
 desc 'Fetch companies html pages data after bing search'
 task fetch_companies_data: [:environment] do |_t, _args|
   companies = %w[Apple Meta Google Rakuten Nvidia Twilio]
+
   companies_data_file = 'companies_data.csv'
 
   CSV.open(companies_data_file, 'w') do |csv|
@@ -14,9 +15,19 @@ task fetch_companies_data: [:environment] do |_t, _args|
       puts "Query: #{search_sentence}"
       puts 'URLs from bing search'
       results = bing_search(search_sentence)
-      page_html, url = extract_page_data(results)
+      page_html, page_text, url = extract_page_data(results)
       page_html.scan(%r{<a.*?</a>})&.each do |anchor|
-        csv << [company, url, anchor, '']
+        doc = Nokogiri::HTML.parse(anchor)
+        anchor_text = doc.xpath('//a/text()').to_s.strip
+        regex = /(.{0,200}#{anchor_text}.{0,200})/i
+        match_data = regex.match(page_text)
+        text = if match_data
+                 textt = match_data[1]
+                 textt.sub(anchor_text, anchor)
+               else
+                 anchor
+               end
+        csv << [company, url, text, '']
       end
     end
   end
@@ -54,7 +65,9 @@ def extract_page_data(results)
   driver = Selenium::WebDriver.for(:chrome, options: options)
   driver.get(url)
   driver.execute_script('return document.readyState')
-  html = driver.find_element(:tag_name => "body").attribute('innerHTML')
+  document = driver.find_element(tag_name: 'body')
+  html = document.attribute('innerHTML')
+  text = document.text
   driver.quit
-  [html, url]
+  [html, text, url]
 end
