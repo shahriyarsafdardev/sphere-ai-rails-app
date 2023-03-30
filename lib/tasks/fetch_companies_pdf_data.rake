@@ -21,7 +21,7 @@ task :fetch_companies_pdf_data, [:companies] => [:environment] do |_t, args|
       next unless Document.find_by(url: pdf_link).nil?
 
       publish_date, title, transcript = extract_pdf_text(pdf_link)
-      unless transcript.nil?
+      unless transcript.nil? || publish_date.nil?
         new_doc = Document.create(published_at: publish_date, title: title, url: pdf_link, company_id: company.id, transcript: transcript)
         puts "Created Document with id: #{new_doc.id}"
       end
@@ -108,9 +108,22 @@ def extract_pdf_text(pdf_link)
     pages.each_with_index do |page, i|
       page_json << { number: (i + 1).to_s, text: page.text.squeeze.strip }
     end
-    [reader_info[:ModDate] || reader_info[:CreationDate], reader_info[:Title], page_json]
+    publish_date = convert_date(reader_info[:ModDate] || reader_info[:CreationDate])
+    [publish_date, reader_info[:Title], page_json]
   rescue StandardError => e
     puts e
     [nil, nil, nil]
+  end
+end
+
+def convert_date(date)
+  return if date.nil?
+
+  begin
+    date_string = date[2..13]
+    DateTime.strptime(date_string, '%Y%m%d')
+  rescue StandardError => e
+    puts e
+    nil
   end
 end
