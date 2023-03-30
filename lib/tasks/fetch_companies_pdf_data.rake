@@ -21,8 +21,10 @@ task :fetch_companies_pdf_data, [:companies] => [:environment] do |_t, _args|
       next unless Document.find_by(url: pdf_link).nil?
 
       publish_date, title, transcript = extract_pdf_text(pdf_link)
-      new_doc = Document.create(published_at: publish_date, title: title, url: pdf_link, company_id: company.id, transcript: transcript)
-      puts "Created Doc with id: #{new_doc.id}"
+      unless transcript.nil?
+        new_doc = Document.create(published_at: publish_date, title: title, url: pdf_link, company_id: company.id, transcript: transcript)
+        puts "Created Document with id: #{new_doc.id}"
+      end
     end
   end
 end
@@ -94,14 +96,20 @@ def update_pdf_link(pdf_link, domain)
 end
 
 def extract_pdf_text(pdf_link)
-  pdf = URI.open(pdf_link)
-  reader = PDF::Reader.new(pdf)
-  reader_info = reader.info
-  page_json = reader.pages.map.with_index { |page, i| { number: i + 1, text: page.text.squeeze.strip } }
-  puts "Date: #{reader_info[:ModDate]}"
-  puts "Title: #{reader_info[:Title]}"
-  puts "Page: #{page_json}"
-  [reader_info[:ModDate], reader_info[:Title], page_json]
-rescue StandardError => e
-  puts e
+  page_json = []
+
+  begin
+    pdf = URI.open(pdf_link)
+    reader = PDF::Reader.new(pdf)
+    reader_info = reader.info
+    pages = reader.pages
+    puts "PDF Link >> #{pdf_link}"
+    pages.each_with_index do |page, i|
+      page_json << { number: "#{i + 1}", text: page.text.squeeze.strip }
+    end
+    [reader_info[:ModDate] || reader_info[:CreationDate], reader_info[:Title], page_json]
+  rescue StandardError => e
+    puts e
+    [nil, nil, nil]
+  end
 end
