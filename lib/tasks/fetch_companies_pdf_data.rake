@@ -105,7 +105,7 @@ def extract_pdf_text(pdf_link)
     pages = reader.pages
     puts "PDF Link >> #{pdf_link}"
     pages.each_with_index do |page, i|
-      page_json << { number: "#{i + 1}", text: page.text.squeeze.strip }
+      page_json << { number: (i + 1).to_s, text: page.text.squeeze.strip }
     end
     [reader_info[:ModDate] || reader_info[:CreationDate], reader_info[:Title], page_json]
   rescue StandardError => e

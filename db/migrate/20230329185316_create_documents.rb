@@ -2,12 +2,12 @@
 
 class CreateDocuments < ActiveRecord::Migration[6.1]
   def change
-    create_table :documents do |t|
+    create_table :documents, id: :uuid do |t|
       t.datetime :published_at
       t.string :title
       t.json :transcript, default: []
       t.string :url
-      t.references :company, null: false, foreign_key: true
+      t.references :company, type: :uuid, null: false, foreign_key: true
 
       t.timestamps
     end
