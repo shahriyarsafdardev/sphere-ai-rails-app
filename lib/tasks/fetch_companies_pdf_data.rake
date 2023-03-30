@@ -6,8 +6,8 @@ require 'open-uri'
 require 'pdf-reader'
 
 desc 'Fetch companies all pdf documents data after bing search'
-task :fetch_companies_pdf_data, [:companies] => [:environment] do |_t, _args|
-  companies = _args[:companies].split(' ')
+task :fetch_companies_pdf_data, [:companies] => [:environment] do |_t, args|
+  companies = args[:companies].split(' ')
   companies.each do |company|
     search_sentence = "#{company} investor relations"
     puts "Query: #{search_sentence}"
@@ -62,6 +62,7 @@ def fetch_html(url)
   puts "URL: #{url}"
 
   options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--headless')
   options.add_argument('user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36')
   driver = Selenium::WebDriver.for(:chrome, options: options)
   driver.get(url)
