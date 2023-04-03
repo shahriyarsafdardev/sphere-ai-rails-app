@@ -353,6 +353,7 @@ DEPENDENCIES
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data
+  warden-jwt_auth
 
 RUBY VERSION
    ruby 3.1.3p185

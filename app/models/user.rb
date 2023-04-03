@@ -17,7 +17,7 @@ class User < ApplicationRecord
     first_name, last_name = auth['name']&.split(' ')
     User.where(email: auth['email']).first_or_create do |user|
       user.email = auth['email']
-      user.password = Devise.friendly_token[0, 20]
+      user.password = ENV['DEFAULT_PASSWORD']
       user.first_name = first_name
       user.last_name = last_name
       user.profile_picture_data = auth['picture']
