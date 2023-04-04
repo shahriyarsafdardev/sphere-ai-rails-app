@@ -17,12 +17,13 @@ class Api::V1::DocumentsController < ApplicationController
   private
 
   def get_matches(document)
-    regex = /#{@query}/i
+    @query.gsub!(/[^0-9A-Za-z ]/, '')
+    regex = /#{@query.strip}/i
 
     document&.transcript&.map do |page|
       page_matches = []
       text = page['text']
-      words = text.scan(/[\w']+|\p{P}/)
+      words = text.split(/[\s\n]+/)
       words.each_with_index do |_word, i|
         next unless regex.match?(words[i...(i + @query.split(' ').length)].join(' '))
 
