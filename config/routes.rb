@@ -35,6 +35,11 @@ Rails.application.routes.draw do
           get :my_references
         end
       end
+      resources :documents, only: [] do
+        collection do
+          get :search
+        end
+      end
     end
   end
 end

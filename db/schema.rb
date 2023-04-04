@@ -10,20 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_27_201017) do
+ActiveRecord::Schema.define(version: 2023_03_31_141129) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
+  create_table "companies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "published_at"
+    t.string "title"
+    t.json "transcript", default: []
+    t.string "url"
+    t.uuid "company_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["company_id"], name: "index_documents_on_company_id"
+  end
+
   create_table "hubspot_references", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", default: "", null: false
     t.string "hubspot_access_token", default: "", null: false
     t.string "environment", default: "", null: false
-    t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_hubspot_references_on_user_id"
   end
 
   create_table "jwt_denylist", force: :cascade do |t|
@@ -39,10 +54,9 @@ ActiveRecord::Schema.define(version: 2023_03_27_201017) do
     t.string "password", null: false
     t.string "host", null: false
     t.integer "port", null: false
-    t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_postgres_references_on_user_id"
+    t.text "documentation"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -63,6 +77,5 @@ ActiveRecord::Schema.define(version: 2023_03_27_201017) do
     t.index ["slug"], name: "index_users_on_slug", unique: true
   end
 
-  add_foreign_key "hubspot_references", "users"
-  add_foreign_key "postgres_references", "users"
+  add_foreign_key "documents", "companies"
 end

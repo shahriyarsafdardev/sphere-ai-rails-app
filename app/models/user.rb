@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  has_many :postgres_references, dependent: :destroy
 
   extend FriendlyId
-  has_many :hubspot_references, dependent: :destroy
   friendly_id :slugged_candidates, use: :slugged
 
   validates :first_name, :last_name, :slug, :email, presence: true

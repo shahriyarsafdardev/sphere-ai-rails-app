@@ -1,3 +1,3 @@
 class HubspotReferenceSerializer < ActiveModel::Serializer
-  attributes :id, :name, :environment, :user_id
+  attributes :id, :name, :environment
 end
