@@ -3,8 +3,8 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def google_oauth2
     url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=#{params['token']}"
-    responsee = HTTParty.get(url)
-    @user = User.from_omniauth(responsee.parsed_response)
+    google_response = HTTParty.get(url)
+    @user = User.from_omniauth(google_response.parsed_response)
     if @user && sign_in(@user)
       response.headers['Authorization'] = "Bearer #{generate_custom_devise_token(@user)}"
       render json: { message: 'user was successfully logged in!', user: @user }, status: :created
