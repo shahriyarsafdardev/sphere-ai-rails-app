@@ -61,3 +61,9 @@ gem 'pdf-reader'
 gem 'rack-cors'
 gem 'redis'
 gem 'selenium-webdriver'
+# Google authentication
+gem 'omniauth'
+# Use Omniauth Google plugin
+gem 'omniauth-google-oauth2'
+# Use ActiveRecord Sessions
+gem 'activerecord-session_store', '~> 1.0'

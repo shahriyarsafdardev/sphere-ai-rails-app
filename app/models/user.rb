@@ -9,8 +9,20 @@ class User < ApplicationRecord
   validates :email, :slug, uniqueness: true
 
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable,
-         :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
+         :recoverable, :rememberable, :validatable, :omniauthable,
+         :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist,
+                               omniauth_providers: [:google_oauth2]
+
+  def self.from_omniauth(auth)
+    first_name, last_name = auth['name']&.split(' ')
+    User.where(email: auth['email']).first_or_create do |user|
+      user.email = auth['email']
+      user.password = ENV['DEFAULT_PASSWORD']
+      user.first_name = first_name
+      user.last_name = last_name
+      user.profile_picture_data = auth['picture']
+    end
+  end
 
   def full_name
     "#{first_name} #{last_name}"
@@ -40,3 +52,5 @@ class User < ApplicationRecord
     first_name_changed? || last_name_changed? || super
   end
 end
+
+# rubocop:enable Lint/Syntax
