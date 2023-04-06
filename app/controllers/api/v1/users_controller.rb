@@ -4,7 +4,7 @@ class Api::V1::UsersController < ApplicationController
   before_action :authenticate_user!, except: %i[reset_password update_password]
 
   def my_account
-    render json: { user: current_user }, status: :ok
+    render json: current_user, status: :ok
   end
 
   def create

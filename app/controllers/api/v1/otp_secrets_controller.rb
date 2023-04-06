@@ -7,7 +7,7 @@ class Api::V1::OtpSecretsController < ApplicationController
   def create
     unless current_user.otp_secret?
       @otp_secret = ROTP::Base32.random
-      current_user.update(otp_secret: @otp_secret)
+      current_user.update!(otp_secret: @otp_secret)
     end
     set_totp_secret
     qr_link = @totp.provisioning_uri(current_user.email)
@@ -18,7 +18,7 @@ class Api::V1::OtpSecretsController < ApplicationController
   def verify
     otp_verified_at = @totp.verify(params[:otp_code], drift_behind: 15)
     if otp_verified_at
-      current_user.update(otp_verified_at: DateTime.now)
+      current_user.update!(is_otp_verified: true, otp_verified_at: DateTime.now)
 
       render json: { message: 'Successfully verified!' }, status: :ok
     else
