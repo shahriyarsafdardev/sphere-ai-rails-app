@@ -41,6 +41,11 @@ Rails.application.routes.draw do
           get :search
         end
       end
+      resources :otp_secrets, only: [:create] do
+        collection do
+          post :verify
+        end
+      end
     end
   end
 end

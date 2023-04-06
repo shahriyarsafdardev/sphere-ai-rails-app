@@ -67,3 +67,5 @@ gem 'omniauth'
 gem 'omniauth-google-oauth2'
 # Use ActiveRecord Sessions
 gem 'activerecord-session_store', '~> 1.0'
+# Two Factor Authentication
+gem 'rotp'
