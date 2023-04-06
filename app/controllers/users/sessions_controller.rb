@@ -15,7 +15,6 @@ module Users
     end
 
     def log_out_success
-      current_user.update!(is_otp_verified: false)
       render json: { message: 'Logged out successfully!' }, status: :ok
     end
 
