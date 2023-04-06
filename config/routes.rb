@@ -17,6 +17,7 @@ Rails.application.routes.draw do
         member do
           patch :change_password
           post :reset_password
+          patch :set_authenticator_hex
         end
       end
       resources :postgres_references do

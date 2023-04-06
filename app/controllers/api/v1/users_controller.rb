@@ -52,6 +52,13 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  def set_authenticator_hex
+    hex = params[:authenticator_hex]
+    render json: { message: 'Authenticator hex saved' }, status: :ok if current_user.update(authenticator_hex: hex)
+
+    render json: { message: 'Unable to save Authenticator hex' }, status: :unprocessable_entity
+  end
+
   private
 
   def user_create_params

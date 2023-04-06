@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :id, :email, :first_name, :last_name, :role
+  attributes :id, :email, :first_name, :last_name, :role, :authenticator_hex
   attribute :message, if: :show_message?
 
   def message
