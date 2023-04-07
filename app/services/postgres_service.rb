@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostgresService
   class << self
     def execute_query(postgres_reference, query)
@@ -19,7 +21,7 @@ class PostgresService
       # tables and associations
       # sql = "SELECT conrelid::regclass AS table_name, conname, pg_get_constraintdef(c.oid) AS constraint_def FROM pg_constraint c WHERE contype = 'f' ORDER BY conrelid::regclass::text, conname;"
       # schema of some specific tables
-      sql = "SELECT tc.table_name AS table, tc.column_name AS column, ccu.table_name AS foreign_table FROM information_schema.columns AS tc LEFT JOIN information_schema.key_column_usage AS kcu ON tc.table_name = kcu.table_name AND tc.column_name = kcu.column_name LEFT JOIN information_schema.constraint_column_usage AS ccu ON kcu.constraint_name = ccu.constraint_name WHERE tc.table_name IN (#{table_names}) ORDER BY tc.table_name, tc.ordinal_position;"
+      sql = "SELECT tc.table_name AS table, tc.column_name AS column FROM information_schema.columns AS tc LEFT JOIN information_schema.key_column_usage AS kcu ON tc.table_name = kcu.table_name AND tc.column_name = kcu.column_name LEFT JOIN information_schema.constraint_column_usage AS ccu ON kcu.constraint_name = ccu.constraint_name WHERE tc.table_name IN (#{table_names}) ORDER BY tc.table_name, tc.ordinal_position;"
       execute_query(postgres_reference, sql)&.map { |row| row }
     end
 

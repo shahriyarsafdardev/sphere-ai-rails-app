@@ -9,18 +9,21 @@ class GptService
     def query_with_postgres_reference(reference, raw_query)
       table_names = PostgresService.fetch_table_names(reference)
       tables_prompt = "Process the documentation from ‘#{reference&.documentation}’ and table names from ‘#{table_names}’ to return the appropriate table names needed to process the query ‘#{raw_query}‘. Add :: before the table name and don’t add any additional information and tables"
-      parsed_table_names = ask_gpt(tables_prompt)&.scan(/::\w+/)&.map do |t|
-                             t[2...t.length]
-                           end&.map { |table| "'#{table}'" }&.join(', ')
-      db_schema = PostgresService.fetch_tables_schema(reference, parsed_table_names)
+      db_schema = PostgresService.fetch_tables_schema(reference, parsed_table_names(tables_prompt))&.to_s&.gsub('=>', ':')&.gsub('"', '')
       prompt = "Your goal is to take this text: \"#{raw_query}\" and suggest a Postgres query that will execute on a database with the following schema and answer their question: #{db_schema}. Explain your reasoning first, then include the complete query at the end of your response with :: before and after the query"
       ask_gpt(prompt)
+    end
+
+    def parsed_table_names(tables_prompt)
+      ask_gpt(tables_prompt)&.scan(/::\w+/)&.map do |t|
+        t[2...t.length]
+      end&.map { |table| "'#{table}'" }&.join(', ')
     end
 
     def ask_gpt(prompt)
       response = ClientOpenAI.chat(
         parameters: {
-          model: 'gpt-4',
+          model: 'gpt-3.5-turbo',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.5,
         }
@@ -29,13 +32,13 @@ class GptService
     end
 
     def query_with_hubspot_reference(raw_query, id)
-      access_token = HubspotReference.find_by_id(id)&.hubspot_access_token
+      access_token = HubspotReference.find_by(id: id)&.hubspot_access_token
       properties = HubspotService.get_schema('Contact', access_token)
       operators = %w[EQ NEQ LT LTE GT GTE BETWEEN IN NOT_IN HAS_PROPERTY NOT_HAS_PROPERTY CONTAINS_TOKEN NOT_CONTAINS_TOKEN]
       prompt = "Please extract the filters from the user input: #{raw_query} and create a HubSpot API request body with filterGroups and filters based on the following available propertyNames: #{properties} and the following available operators: #{operators}. If the user input contains multiple filters with the AND operator, place all the filters within a single filterGroup. If the user input contains multiple filters with the OR operator, place each filter within its own filterGroup. Do not include the property names in the body."
       body_json = get_gpt_response(prompt)
       # body_json['properties'] = properties
-      data = HubspotService.get_filtered_results_from_hubspot(body_json, access_token)
+      HubspotService.get_filtered_results_from_hubspot(body_json, access_token)
     end
 
     def get_gpt_response(prompt)
