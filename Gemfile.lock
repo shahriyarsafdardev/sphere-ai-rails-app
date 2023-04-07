@@ -247,6 +247,7 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.2.5)
+    rotp (6.2.2)
     rubocop (1.48.1)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -341,6 +342,7 @@ DEPENDENCIES
   rack-cors
   rails (~> 6.1.7, >= 6.1.7.3)
   redis
+  rotp
   rubocop
   rubocop-performance
   rubocop-rails
