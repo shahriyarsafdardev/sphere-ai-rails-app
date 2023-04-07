@@ -17,6 +17,6 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def is_otp_verified
-    object.is_otp_verified && (DateTime.now - object.otp_verified_at.to_datetime).to_i <= 7
+    object.is_otp_verified && object.otp_verified_at && (DateTime.now - object.otp_verified_at.to_datetime).to_i <= 7
   end
 end
